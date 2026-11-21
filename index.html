@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="sw">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090d18">
+<meta name="description" content="ANOCATCH TZA Movie & Connection">
+<title>ANOCATCH TZA 🇹🇿 | MOVIE & CONNECTION</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="#"><span class="flag">🇹🇿</span><span>ANO<span class="accent">CATCH</span> TZA<small>MOVIE & CONNECTION</small></span></a>
+<nav><a href="#movies">Movies</a><a href="#about">Kuhusu</a><button id="adminOpen" class="outline">Admin</button></nav>
+</header>
+<main>
+<section class="hero"><div class="hero-copy"><p class="eyebrow">TANZANIA • ENTERTAINMENT</p><h1>Burudani yako,<br><span class="accent">sehemu moja.</span></h1><p>Tazama video na filamu zinazopatikana kwa ruhusa ya wamiliki wake. Chagua bure au lipia kupitia maelekezo ya muuzaji.</p><a class="primary" href="#movies">Gundua Movies</a></div><div class="hero-art"><div class="play">▶</div><span>ANOCATCH TZA</span></div></section>
+<section id="movies" class="section"><div class="section-head"><div><p class="eyebrow">MAKTABA</p><h2>Movies & Videos</h2></div><input id="search" type="search" placeholder="Tafuta movie..."></div><div id="movieGrid" class="movie-grid"><p class="muted">Inapakia maktaba...</p></div></section>
+<section id="about" class="about"><h2>ANOCATCH TZA 🇹🇿</h2><p>Jukwaa la video na filamu. Tunachapisha maudhui ambayo tuna haki au ruhusa ya kusambaza.</p><p>WhatsApp: <a href="https://wa.me/25569583362">+255 695 833 62</a></p></section>
+</main>
+<footer>© <span id="year"></span> ANOCATCH TZA • MOVIE & CONNECTION</footer>
+<dialog id="adminDialog"><form method="dialog" class="dialog-head"><h2>Admin Dashboard</h2><button class="x" aria-label="Funga">×</button></form><div id="adminPanel"><p>Ingia kwa Google ili kusimamia maudhui. Admin pekee: <b>destinyline0000@gmail.com</b></p><button id="googleLogin" class="primary">Endelea na Google</button><p id="authStatus" class="muted"></p><div id="adminTools" hidden><h3>Ongeza movie / video</h3><label>Jina<input id="movieTitle" required maxlength="100"></label><label>Maelezo<input id="movieDescription" maxlength="240"></label><label>Poster URL (hiari)<input id="posterUrl" type="url"></label><label>Video URL (link ya moja kwa moja yenye ruhusa)<input id="videoUrl" type="url" required></label><label>Aina<select id="movieType"><option value="free">Bure</option><option value="paid">Ya kulipia</option></select></label><button id="saveMovie" class="primary">Hifadhi movie</button><button id="logout" class="outline">Toka</button><p id="saveStatus" class="muted"></p><h3>Movies zako</h3><div id="adminMovieList"></div></div></div></dialog>
+<script type="module" src="app.js"></script>
+</body></html>

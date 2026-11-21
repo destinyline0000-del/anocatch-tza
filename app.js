@@ -1,0 +1,26 @@
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+// Weka Project URL na anon/public key kutoka Supabase > Project Settings > API.
+// USIWEKE service_role key hapa.
+const SUPABASE_URL = '';
+const SUPABASE_ANON_KEY = '';
+const ADMIN_EMAIL = 'destinyline0000@gmail.com';
+const WHATSAPP = '25569583362';
+const supabase = SUPABASE_URL && SUPABASE_ANON_KEY ? createClient(SUPABASE_URL,SUPABASE_ANON_KEY) : null;
+const $ = id => document.getElementById(id);
+let movies = [];
+$('year').textContent = new Date().getFullYear();
+function safeUrl(value){try{const u=new URL(value);return ['https:','http:'].includes(u.protocol)?u.href:'#'}catch{return '#'}}
+function render(list){const grid=$('movieGrid');grid.innerHTML='';if(!list.length){grid.innerHTML='<p class="muted">Bado hakuna movie zilizowekwa. Rudi tena hivi karibuni.</p>';return}
+ for(const m of list){const card=document.createElement('article');card.className='movie';const poster=document.createElement('div');poster.className='poster';if(m.poster_url&&safeUrl(m.poster_url)!=='#')poster.style.backgroundImage='linear-gradient(#0002,#0005),url("'+safeUrl(m.poster_url)+'")';else poster.textContent='▶';const info=document.createElement('div');info.className='movie-info';const h=document.createElement('h3');h.textContent=m.title;const p=document.createElement('p');p.textContent=m.description||'';const pill=document.createElement('span');pill.className='pill '+(m.type==='paid'?'paid':'');pill.textContent=m.type==='paid'?'PAID • TSh 500':'BURE';const actions=document.createElement('div');actions.className='movie-actions';const a=document.createElement('a');a.className='watch';a.href=m.type==='paid'?'https://wa.me/'+WHATSAPP+'?text='+encodeURIComponent('Habari, nahitaji kupata movie: '+m.title+' (TSh 500).'):safeUrl(m.video_url);a.target='_blank';a.rel='noopener';a.textContent=m.type==='paid'?'Omba kulipia':'Tazama / Pakua';actions.append(a);info.append(h,p,pill,actions);card.append(poster,info);grid.append(card)}
+}
+async function loadMovies(){if(!supabase){movies=JSON.parse(localStorage.getItem('anocatch-demo-movies')||'[]');render(movies);$('authStatus').textContent='Weka Supabase URL na anon key kwenye app.js, kisha endesha supabase/schema.sql.';return}const {data,error}=await supabase.from('movies').select('*').eq('published',true).order('created_at',{ascending:false});if(error){$('movieGrid').textContent='Imeshindikana kupakia. Hakikisha umeendesha schema.sql kwenye Supabase.';return}movies=data||[];render(movies)}
+$('search').addEventListener('input',e=>render(movies.filter(m=>(m.title+' '+(m.description||'')).toLowerCase().includes(e.target.value.toLowerCase()))));
+$('adminOpen').onclick=()=>{$('adminDialog').showModal();refreshAuth()};
+async function refreshAuth(){if(!supabase)return;const {data:{session}}=await supabase.auth.getSession();const user=session?.user;$('adminTools').hidden=!(user?.email?.toLowerCase()===ADMIN_EMAIL);$('googleLogin').hidden=!!user;$('authStatus').textContent=user?('Umeingia: '+user.email+(user.email.toLowerCase()===ADMIN_EMAIL?' — Admin':' — huna ruhusa ya Admin')):'Ingia kwa Google.';if(user?.email?.toLowerCase()===ADMIN_EMAIL)loadAdminMovies()}
+$('googleLogin').onclick=async()=>{if(!supabase){$('authStatus').textContent='Kwanza weka Supabase URL na anon key kwenye app.js.';return}const {error}=await supabase.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname}});if(error)$('authStatus').textContent=error.message};
+$('logout').onclick=async()=>{await supabase?.auth.signOut();refreshAuth()};
+$('saveMovie').onclick=async()=>{const item={title:$('movieTitle').value.trim(),description:$('movieDescription').value.trim(),poster_url:safeUrl($('posterUrl').value),video_url:safeUrl($('videoUrl').value),type:$('movieType').value,published:true};if(!item.title||item.video_url==='#'){$('saveStatus').textContent='Jaza jina na video link halali ya http/https.';return}if(!supabase){$('saveStatus').textContent='Unganisha Supabase kwanza.';return}const {error}=await supabase.from('movies').insert(item);$('saveStatus').textContent=error?error.message:'Movie imehifadhiwa.';if(!error){$('movieTitle').value='';$('movieDescription').value='';$('posterUrl').value='';$('videoUrl').value='';await loadAdminMovies();await loadMovies()}};
+async function loadAdminMovies(){const {data,error}=await supabase.from('movies').select('id,title').order('created_at',{ascending:false});const el=$('adminMovieList');el.innerHTML='';if(error){el.textContent=error.message;return}for(const m of data||[]){const row=document.createElement('div');row.className='admin-row';const span=document.createElement('span');span.textContent=m.title;const b=document.createElement('button');b.className='delete';b.textContent='Futa';b.onclick=async()=>{if(confirm('Futa '+m.title+'?')){const {error}=await supabase.from('movies').delete().eq('id',m.id);if(error)alert(error.message);else{loadAdminMovies();loadMovies()}}};row.append(span,b);el.append(row)}}
+if(supabase)supabase.auth.onAuthStateChange(()=>refreshAuth());
+loadMovies();
